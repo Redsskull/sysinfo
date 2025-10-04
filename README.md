@@ -13,23 +13,40 @@ A lightweight system information tool inspired by neofetch and btop, built to un
 - 🎨 Clean, colorful output
 
 ## Installation
+
 ```bash
 go install github.com/Redsskull/sysinfo@latest
+```
 
 Or build from source:
-bashgit clone https://github.com/yourusername/sysinfo
+
+```bash
+git clone https://github.com/Redsskull/sysinfo
 cd sysinfo
 go build -o sysinfo
 sudo mv sysinfo /usr/local/bin/
-Usage
+```
+
+## Usage
+
 Simply run:
-bashsysinfo
-Platforms
 
-✅ Linux
-✅ macOS
-❌ Windows (not yet supported)
+```bash
+sysinfo
+```
 
-Why?
+## Platforms
+
+- ✅ Linux
+- ✅ macOS
+- ❌ Windows (not yet supported)
+
+## Why?
+
 This is a passion project to explore how operating systems expose information about themselves. It's about understanding the "brain" of the system, not just making things pretty.
+
 Part of my journey to build intelligent systems from the ground up.
+
+## License
+
+MIT
