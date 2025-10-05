@@ -29,14 +29,18 @@ func main() {
 }
 
 func displayLogo() {
-	// Simple ASCII art - you can customize this!
 	logo := `
-    ███████╗██╗   ██╗███████╗██╗███╗   ██╗███████╗ ██████╗
-    ██╔════╝╚██╗ ██╔╝██╔════╝██║████╗  ██║██╔════╝██╔═══██╗
-    ███████╗ ╚████╔╝ ███████╗██║██╔██╗ ██║█████╗  ██║   ██║
-    ╚════██║  ╚██╔╝  ╚════██║██║██║╚██╗██║██╔══╝  ██║   ██║
-    ███████║   ██║   ███████║██║██║ ╚████║██║     ╚██████╔╝
-    ╚══════╝   ╚═╝   ╚══════╝╚═╝╚═╝  ╚═══╝╚═╝      ╚═════╝
+       ▄████████▄
+      ███▀▀  ▀▀███        ╔═══════════════════╗
+     ██  ◉    ◉  ██       ║   SYSTEM  INFO    ║
+     ██           ██      ╚═══════════════════╝
+      ██  ╔═══╗  ██
+       ██ ╚═══╝ ██        Building the brain
+        ██     ██         of intelligent systems
+         ███████
+        ╔═╩═╩═╩═╗
+        ║ ▓▓▓▓▓ ║
+        ╚═══════╝
 `
 	fmt.Print(Cyan + logo + Reset)
 }
@@ -45,6 +49,8 @@ func displayInfo() {
 	printInfo("OS", getOSInfo())
 	printInfo("Kernel", getKernelVersion())
 	printInfo("Uptime", getUptime())
+	printInfo("DE", getDesktopEnvironment())
+	printInfo("Terminal", getTerminal())
 	printInfo("Shell", getShell())
 	printInfo("CPU", getCPUInfo())
 	printInfo("Memory", getMemoryInfo())
@@ -128,6 +134,67 @@ func getShell() string {
 	}
 	parts := strings.Split(shell, "/")
 	return parts[len(parts)-1]
+}
+
+func getDesktopEnvironment() string {
+	// Try multiple environment variables
+	de := os.Getenv("XDG_CURRENT_DESKTOP")
+	if de != "" {
+		return de
+	}
+
+	de = os.Getenv("DESKTOP_SESSION")
+	if de != "" {
+		return de
+	}
+
+	// Check for specific DEs
+	if os.Getenv("GNOME_DESKTOP_SESSION_ID") != "" {
+		return "GNOME"
+	}
+	if os.Getenv("KDE_FULL_SESSION") != "" {
+		return "KDE"
+	}
+
+	return "Unknown"
+}
+
+func getTerminal() string {
+	// Try TERM_PROGRAM first (set by many modern terminals)
+	term := os.Getenv("TERM_PROGRAM")
+	if term != "" {
+		return term
+	}
+
+	// Check parent process name
+	if runtime.GOOS == "linux" {
+		ppid := os.Getppid()
+		cmdlinePath := fmt.Sprintf("/proc/%d/cmdline", ppid)
+		data, err := os.ReadFile(cmdlinePath)
+		if err == nil {
+			cmdline := string(data)
+			// cmdline has null bytes, clean it up
+			cmdline = strings.ReplaceAll(cmdline, "\x00", " ")
+			parts := strings.Fields(cmdline)
+			if len(parts) > 0 {
+				// Get just the terminal name, not full path
+				termName := parts[0]
+				if strings.Contains(termName, "/") {
+					pathParts := strings.Split(termName, "/")
+					termName = pathParts[len(pathParts)-1]
+				}
+				return termName
+			}
+		}
+	}
+
+	// Fallback to TERM variable
+	term = os.Getenv("TERM")
+	if term != "" {
+		return term
+	}
+
+	return "Unknown"
 }
 
 func getCPUInfo() string {
